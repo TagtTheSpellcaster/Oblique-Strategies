@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oblique Strategies / Strategie Oblique</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        header {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10;
+        }
+
+        .lang-switch {
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            color: #444444;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            color: #555555;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 400;
+            padding: 0;
+            outline: none;
+            transition: color 0.2s ease;
+        }
+
+        .lang-btn:hover {
+            color: #888888;
+        }
+
+        .lang-btn.active {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .strategy {
+            font-size: clamp(1.4rem, 3.5vw, 2.8rem);
+            font-weight: 300;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            max-width: 900px;
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .strategy.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="lang-switch" onclick="event.stopPropagation()">
+            <button id="btn-en" class="lang-btn active" onclick="setLanguage('en')">EN</button>
+            <span>|</span>
+            <button id="btn-it" class="lang-btn" onclick="setLanguage('it')">IT</button>
+        </div>
+    </header>
+
+    <main>
+        <div id="text" class="strategy"></div>
+    </main>
+
+    <script>
+        const strategies = [
+            {
+                en: "Abandon normal instruments",
+                it: "Abbandona gli strumenti consueti."
+            },
+            {
+                en: "Accept advice",
+                it: "Accetta consigli."
+            },
+            {
+                en: "Accretion",
+                it: "Accrescimento."
+            },
+            {
+                en: "Aline the discipline needed with the discipline needed",
+                it: "Allinea la disciplina necessaria con la disciplina richiesta."
+            },
+            {
+                en: "Are there sections? Consider transitions",
+                it: "Ci sono sezioni? Considera le transizioni."
+            },
+            {
+                en: "Ask your body",
+                it: "Chiedi al tuo corpo."
+            },
+            {
+                en: "Assemble some of the instruments in a group and treat the group as a single instrument",
+                it: "Raggruppa alcuni strumenti e trattali come uno solo."
+            },
+            {
+                en: "Balance the consistency principle with the inconsistency principle",
+                it: "Bilancia il principio di coerenza con il principio di incoerenza."
+            },
+            {
+                en: "Be dirty",
+                it: "Sii sporco."
+            },
+            {
+                en: "Be extravagant",
+                it: "Sii stravagante."
+            },
+            {
+                en: "Breathe more deeply",
+                it: "Respira più profondamente."
+            },
+            {
+                en: "Bridges -build -burn",
+                it: "Ponti: costruiscili o bruciali."
+            },
+            {
+                en: "Cascades",
+                it: "Cascate."
+            },
+            {
+                en: "Change instrument roles",
+                it: "Inverti o cambia il ruolo degli strumenti."
+            },
+            {
+                en: "Change nothing and continue with immaculate consistency",
+                it: "Non cambiare nulla e prosegui con immacolata coerenza."
+            },
+            {
+                en: "Courage!",
+                it: "Coraggio!"
+            },
+            {
+                en: "Cut a vital connection",
+                it: "Taglia una connessione vitale."
+            },
+            {
+                en: "Decorate, decorate",
+                it: "Decora, decora."
+            },
+            {
+                en: "Define an area as 'safe' and use it as an anchor",
+                it: "Definisci un'area come 'sicura' e usala come ancora."
+            },
+            {
+                en: "Destroy -nothing -the most important thing",
+                it: "Distruggi: niente oppure la cosa più importante."
+            },
+            {
+                en: "Discard an axiom",
+                it: "Scarta un assioma."
+            },
+            {
+                en: "Disconnect from desire",
+                it: "Disconnettiti dal desiderio."
+            },
+            {
+                en: "Discover the recipes you are using and abandon them",
+                it: "Scopri le formule che stai usando e abbandonale."
+            },
+            {
+                en: "Distort time",
+                it: "Distorci il tempo."
+            },
+            {
+                en: "Do nothing for as long as possible",
+                it: "Non fare nulla per il più lungo tempo possibile."
+            },
+            {
+                en: "Don't be afraid of things because they're easy to do",
+                it: "Non aver paura delle cose solo perché sono facili da fare."
+            },
+            {
+                en: "Don't be frightened to display your talents",
+                it: "Non aver timore di mostrare i tuoi talenti."
+            },
+            {
+                en: "Don't break the silence",
+                it: "Non rompere il silenzio."
+            },
+            {
+                en: "Don't stress one thing more than another",
+                it: "Non dare più peso a una cosa rispetto a un'altra."
+            },
+            {
+                en: "Do something boring",
+                it: "Fai qualcosa di noioso."
+            },
+            {
+                en: "Do the washing up",
+                it: "Lava i piatti."
+            },
+            {
+                en: "Do the words need changing?",
+                it: "Le parole hanno bisogno di essere cambiate?"
+            },
+            {
+                en: "Emphasize differences",
+                it: "Enfatizza le differenze."
+            },
+            {
+                en: "Emphasize repetitions",
+                it: "Enfatizza le ripetizioni."
+            },
+            {
+                en: "Emphasize the flaws",
+                it: "Enfatizza i difetti."
+            },
+            {
+                en: "Faced with a choice, do both",
+                it: "Di fronte a una scelta, fai entrambe le cose."
+            },
+            {
+                en: "Give the game away",
+                it: "Rvela il trucco."
+            },
+            {
+                en: "Give way to your worst impulse",
+                it: "Cedi al tuo impulso peggiore."
+            },
+            {
+                en: "Go slowly all the way round the outside",
+                it: "Gira lentamente intorno a tutto il perimetro esterno."
+            },
+            {
+                en: "Honor thy error as a hidden intention",
+                it: "Onora il tuo errore come un'intenzione nascosta."
+            },
+            {
+                en: "How would you have done it?",
+                it: "Come l'avresti fatto tu?"
+            },
+            {
+                en: "Into the impossible",
+                it: "Verso l'impossibile."
+            },
+            {
+                en: "Is it finished?",
+                it: "È finito?"
+            },
+            {
+                en: "Is there something missing?",
+                it: "Manca qualcosa?"
+            },
+            {
+                en: "It is quite possible (after all)",
+                it: "È assolutamente possibile (dopotutto)."
+            },
+            {
+                en: "Just carry on",
+                it: "Semplicemente continua."
+            },
+            {
+                en: "Left channel, right channel, center channel",
+                it: "Canale sinistro, canale destro, canale centrale."
+            },
+            {
+                en: "Look at a very small object, look at its centre",
+                it: "Guarda un oggetto piccolissimo, guarda il suo centro."
+            },
+            {
+                en: "Look at the order in which you do things",
+                it: "Osserva l'ordine in cui fai le cose."
+            },
+            {
+                en: "Look closely at the most embarrassing details and amplify them",
+                it: "Guarda da vicino i dettagli più imbarazzanti e amplificali."
+            },
+            {
+                en: "Make a blank valuable by putting it in an exquisite frame",
+                it: "Rendi prezioso uno spazio vuoto mettendolo in una cornice squisita."
+            },
+            {
+                en: "Make an exhaustive list of everything you might do and do the last thing on the list",
+                it: "Fai un elenco esaustivo di tutto ciò che potresti fare e fai l'ultima cosa della lista."
+            },
+            {
+                en: "Make a sudden, destructive unpredictable action; incorporate it",
+                it: "Compi un'azione improvvisa, distruttiva e imprevedibile; poi incorporala."
+            },
+            {
+                en: "Mechanicalize something idiosyncratic",
+                it: "Rendi meccanico qualcosa di idiosincratico."
+            },
+            {
+                en: "Mute and continue",
+                it: "Metti in muto e continua."
+            },
+            {
+                en: "Only one element of each kind",
+                it: "Un solo elemento per ciascun tipo."
+            },
+            {
+                en: "Overtly resist change",
+                it: "Resisti apertamente al cambiamento."
+            },
+            {
+                en: "Put in earplugs",
+                it: "Metti i tappi per le orecchie."
+            },
+            {
+                en: "Question the heroic approach",
+                it: "Metti in discussione l'approccio eroico."
+            },
+            {
+                en: "Remove specifics and convert to ambiguities",
+                it: "Rimuovi i dettagli specifici e trasformali in ambiguità."
+            },
+            {
+                en: "Retrace your steps",
+                it: "Ripercorri i tuoi passi."
+            },
+            {
+                en: "Reverse",
+                it: "Inverti."
+            },
+            {
+                en: "Simple subtraction",
+                it: "Sottrazione semplice."
+            },
+            {
+                en: "Spectrum analysis",
+                it: "Analisi dello spettro."
+            },
+            {
+                en: "Take a break",
+                it: "Fai una pausa."
+            },
+            {
+                en: "Take away the elements in order of apparent importance",
+                it: "Togli gli elementi in ordine di apparente importanza."
+            },
+            {
+                en: "Tape your mouth",
+                it: "Imbavagliati la bocca."
+            },
+            {
+                en: "The inconsistency principle",
+                it: "Il principio di incoerenza."
+            },
+            {
+                en: "Trust in the you of now",
+                it: "Fidati del te stesso di adesso."
+            },
+            {
+                en: "Turn it upside down",
+                it: "Capovolgilo."
+            },
+            {
+                en: "Use 'unqualified' people",
+                it: "Coinvolgi persone 'non qualificate'."
+            },
+            {
+                en: "Use an old idea",
+                it: "Usa una vecchia idea."
+            },
+            {
+                en: "Use an unacceptable color",
+                it: "Usa un colore inaccettabile."
+            },
+            {
+                en: "Use fewer notes",
+                it: "Usa meno note."
+            },
+            {
+                en: "Use filters",
+                it: "Usa dei filtri."
+            },
+            {
+                en: "What are you really thinking about just now? Incorporate it",
+                it: "A cosa stai pensando veramente proprio ora? Incorporalo."
+            },
+            {
+                en: "What is the simplicity?",
+                it: "Dov'è la semplicità?"
+            },
+            {
+                en: "What would your closest friend do?",
+                it: "Cosa farebbe il tuo migliore amico?"
+            },
+            {
+                en: "What would your mistake have been?",
+                it: "Quale sarebbe stato il tuo errore?"
+            },
+            {
+                en: "Work at a different speed",
+                it: "Lavora a una velocità diversa."
+            },
+            {
+                en: "You are an engineer",
+                it: "Sei un ingegnere."
+            },
+            {
+                en: "You can only make one dot at a time",
+                it: "Puoi fare solo un punto alla volta."
+            },
+            {
+                en: "You don't have to be ashamed of using your own ideas",
+                it: "Non devi vergognarti di usare le tue idee."
+            }
+        ];
+
+        const textEl = document.getElementById('text');
+        const btnEn = document.getElementById('btn-en');
+        const btnIt = document.getElementById('btn-it');
+        
+        let currentLang = 'en';
+        let currentIndex = -1;
+
+        function setLanguage(lang) {
+            if (currentLang === lang) return;
+            currentLang = lang;
+
+            btnEn.classList.toggle('active', lang === 'en');
+            btnIt.classList.toggle('active', lang === 'it');
+
+            if (currentIndex !== -1) {
+                textEl.classList.remove('visible');
+                setTimeout(() => {
+                    textEl.innerText = strategies[currentIndex][currentLang];
+                    textEl.classList.add('visible');
+                }, 300);
+            }
+        }
+
+        function nextStrategy() {
+            textEl.classList.remove('visible');
+
+            setTimeout(() => {
+                let nextIndex;
+                do {
+                    nextIndex = Math.floor(Math.random() * strategies.length);
+                } while (nextIndex === currentIndex && strategies.length > 1);
+
+                currentIndex = nextIndex;
+                textEl.innerText = strategies[currentIndex][currentLang];
+                textEl.classList.add('visible');
+            }, 300);
+        }
+
+        document.body.addEventListener('click', nextStrategy);
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                nextStrategy();
+            }
+        });
+
+        // Estrazione iniziale all'avvio
+        window.addEventListener('DOMContentLoaded', nextStrategy);
+    </script>
+</body>
+</html>
